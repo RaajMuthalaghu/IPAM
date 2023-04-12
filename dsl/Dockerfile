@@ -1,13 +1,13 @@
 FROM ntnx/calm-dsl
 # Expose Port
 EXPOSE 5004
-ENV CALM_DSL_PC_IP 10.135.20.2
+ENV CALM_DSL_PC_IP 10.38.252.39
 ENV CALM_DSL_PC_PORT 9440
 ENV CALM_DSL_PC_USERNAME admin
 ENV CALM_DSL_PC_PASSWORD Nutanix@123
 ENV CALM_DSL_DEFAULT_PROJECT default
 WORKDIR /
-RUN calm init dsl -i 10.135.20.2 -P 9440 -u admin -p Nutanix@123 -pj default
+RUN calm init dsl -i 10.38.252.39 -P 9440 -u admin -p nx2Tech353! -pj default
 
 # install node.js and run dsl server
 COPY dsl/package*.json ./
