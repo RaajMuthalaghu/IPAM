@@ -1,0 +1,17 @@
+export const CREATE_USER = "CREATE_USER";
+export const RETRIEVE_USERS = "RETRIEVE_USERS";
+export const UPDATE_USER = "UPDATE_USER";
+export const DELETE_USER = "DELETE_USER";
+export const LOGIN_USER = "LOGIN_USER";
+
+export const CREATE_NETWORK = "CREATE_NETWORK";
+export const RETRIEVE_NETWORKS = "RETRIEVE_NETWORKS";
+export const UPDATE_NETWORK = "UPDATE_NETWORK";
+export const DELETE_NETWORK = "DELETE_NETWORK";
+
+export const CREATE_IP = "CREATE_IP";
+export const RETRIEVE_IPS = "RETRIEVE_IPS";
+export const RETRIEVE_IP = "RETRIEVE_IP";
+export const UPDATE_IP = "UPDATE_IP";
+
+//export const DELETE_ALL_USERS = "DELETE_ALL_USERS";

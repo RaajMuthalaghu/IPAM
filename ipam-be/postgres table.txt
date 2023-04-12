@@ -1,0 +1,60 @@
+-- Table: public.ipamip
+
+-- DROP TABLE public.ipamip;
+
+CREATE TABLE public.ipamip
+(
+    network character varying(30) COLLATE pg_catalog."default" NOT NULL,
+    ip character varying(30) COLLATE pg_catalog."default" NOT NULL,
+    exclude boolean DEFAULT false,
+    hostname character varying(30) COLLATE pg_catalog."default",
+    CONSTRAINT fk_network FOREIGN KEY (network)
+        REFERENCES public.ipamnetwork (network) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE public.ipamip
+    OWNER to admin;
+
+-- Table: public.ipamnetwork
+
+-- DROP TABLE public.ipamnetwork;
+
+CREATE TABLE public.ipamnetwork
+(
+    network character varying(30) COLLATE pg_catalog."default" NOT NULL,
+    vlan integer NOT NULL,
+    prefix character varying(30) COLLATE pg_catalog."default" NOT NULL,
+    netmask character varying(30) COLLATE pg_catalog."default" NOT NULL,
+    gateway character varying(30) COLLATE pg_catalog."default" NOT NULL,
+    fromip character varying(30) COLLATE pg_catalog."default",
+    toip character varying(30) COLLATE pg_catalog."default",
+    CONSTRAINT network PRIMARY KEY (network)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE public.ipamnetwork
+    OWNER to admin;
+
+-- Table: public.ipamuser
+
+-- DROP TABLE public.ipamuser;
+
+CREATE TABLE public.ipamuser
+(
+    username character varying(30) COLLATE pg_catalog."default" NOT NULL,
+    password character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    admintype boolean DEFAULT false,
+    CONSTRAINT ipamusers_pkey PRIMARY KEY (username)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE public.ipamuser
+    OWNER to admin;
+
+GRANT ALL ON TABLE public.ipamuser TO admin;

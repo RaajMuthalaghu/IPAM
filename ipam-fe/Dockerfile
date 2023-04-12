@@ -1,0 +1,22 @@
+# pull official base image
+FROM node:14
+
+# Expose Port
+EXPOSE 5001
+
+# set working directory
+WORKDIR /app
+
+# add `/app/node_modules/.bin` to $PATH
+ENV PATH /app/node_modules/.bin:$PATH
+
+# install app dependencies
+COPY ipam-fe/package*.json ./
+RUN npm install --silent
+RUN npm install react-scripts@3.4.1 -g --silent
+
+# add app
+COPY ipam-fe/. .
+
+# start app
+CMD ["npm", "start"]

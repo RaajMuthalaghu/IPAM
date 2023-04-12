@@ -1,0 +1,23 @@
+curl http://localhost:5000/
+curl http://localhost:5000/users
+curl http://localhost:5000/users/Elaine1/
+
+curl -X POST -d "username=Elaine&password=Elaine&admintype=False" http://localhost:5000/users
+curl -X PUT  -d "password=Elaine1" http://localhost:5000/users/Elaine1
+curl -X PUT  -d "admintype=True" http://localhost:5000/users/Elaine1
+curl -X "DELETE" http://localhost:5000/users/Elaine
+-------------
+curl http://localhost:5000/networks
+curl http://localhost:5000/networks/test
+
+curl -X POST -d "network=test1&vlan=101&prefix=20.0.0.1/24&netmask=255.255.255.0&gateway=20.0.0.1&fromIP=20.0.0.2&toIP=20.0.0.254" http://localhost:5000/networks
+curl -X PUT  -d "vlan=102&prefix=20.0.0.1/24&netmask=255.255.255.0&gateway=20.0.0.1&fromIP=20.0.0.2&toIP=20.0.0.254" http://localhost:5000/networks/test1
+curl -X "DELETE" http://localhost:5000/networks/network=test1
+---------
+curl http://localhost:5000/ips/test
+curl http://localhost:5000/freeips/test
+curl http://localhost:5000/usedips/test
+
+curl -X POST -d "network=test1&ip=10.10.0.6&exclude=false" http://localhost:5000/ips
+curl -X PUT  -d "exclude=false&hostname=vm3" http://localhost:5000/ips/10.10.0.5
+curl -X "DELETE" http://localhost:5000/ips/test1

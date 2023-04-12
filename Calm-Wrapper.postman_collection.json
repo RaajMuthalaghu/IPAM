@@ -1,0 +1,333 @@
+{
+	"info": {
+		"_postman_id": "1c0f6660-64e2-4406-93bd-4e7c310e1945",
+		"name": "Calm-Wrapper",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Blueprint list -Name only",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "cmd",
+						"value": "calm get bps -q",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "cmd",
+							"value": "calm get bps -q",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:5004/cmd",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5004",
+					"path": [
+						"cmd"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2. Blueprint list",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "cmd",
+						"value": "calm get bps -q",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "cmd",
+							"value": "calm get bps",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:5004/cmd",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5004",
+					"path": [
+						"cmd"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "3. App list -Name only",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "cmd",
+						"value": "calm get bps -q",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "cmd",
+							"value": "calm get apps -q",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:5004/cmd",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5004",
+					"path": [
+						"cmd"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4. App list",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "cmd",
+						"value": "calm get bps -q",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "cmd",
+							"value": "calm get apps",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:5004/cmd",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5004",
+					"path": [
+						"cmd"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "5. App Launch",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "cmd",
+						"value": "calm get bps -q",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "cmd",
+							"value": "calm launch bp 'Test-Raaj' --app_name DemoRaaj3 -i",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:5004/cmd",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5004",
+					"path": [
+						"cmd"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "7. day2 operation- Stop the App",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "cmd",
+						"value": "calm get bps -q",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "cmd",
+							"value": "calm stop app DemoRaaj3",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:5004/cmd",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5004",
+					"path": [
+						"cmd"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "6. App Status",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "cmd",
+						"value": "calm get bps -q",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "cmd",
+							"value": "calm describe app DemoRaaj3",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:5004/cmd",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5004",
+					"path": [
+						"cmd"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "8. day2 operation- Start the App",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "cmd",
+						"value": "calm get bps -q",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "cmd",
+							"value": "calm start app DemoRaaj3",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:5004/cmd",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5004",
+					"path": [
+						"cmd"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "9. day2 operation- Delete the App",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "cmd",
+						"value": "calm get bps -q",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "cmd",
+							"value": "calm delete app DemoRaaj3",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:5004/cmd",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5004",
+					"path": [
+						"cmd"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

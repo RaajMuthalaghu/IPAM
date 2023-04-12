@@ -1,0 +1,293 @@
+docker run postgres:9.6 --->pull + start
+docker pull/run/start/stop/ps/exec-it/logs/images
+docker run -d <redis>run in deattach mode
+docker ps -a
+docker run -p6000:6379 –name redis-older <redis:4.0>  -docker redis needs 6379. vm port 6000 is bind to docker’s 6379 port
+docker exec -it redis /bin/bash-go inside container-env (list env) --exit
+
+----Docker in Software development
+1.	Create index.html & node.js script. node server.js -- localhost:3000/
+2.	docker pull mongo
+3.	docker pull mongo-express  (this give UI for DB)
+4.	Docker Network: connecting two docker containers. Container when started running creates isolated docker network in host/vm. 
+So any docker inside host can communicate by name, no need of using specific port of that docker.
+docker network ls
+docker network create mongo-network
+5.	docker run -p 27017:27017 -d -e MOGO_INITDB_ROOT_USERNAME=admin  -e MOGO_INITDB_ROOT_PASSWORD=admin –name mongodb –net mongo-network mongo
+6.	docker run -d \
+-p 8081:8081 \
+-e ME_CONFIG_MONGODB_ADMINUSERNAME=admin  \
+-e ME_CONFIG_MONGODB_ADMINPASSWORD=admin \
+–name mongo-express \
+–net mongo-network \
+-e ME_CONFIG_MONGODB_SERVER=mongodb mongo-express
+7.	check status
+Docker logs ………………….id------ (to see created status) or in browse localhost:8081
+Docker ps
+8.	server.js created to use mongodb docker and fetch & update records from localhost:3000/
+a.	docker logs <id> -f
+b.	docker logs <id> | tail
+
+----Docker-Compose (multiple run commands grouped- build utility)
+docker-compose -f mongo.yaml up  (up means start the containers)
+docker-compose -f mongo.yaml down
+
+---Build own docker container from node.js application
+1.	Create dockerfile
+2.	docker build -t my-app:1.0 .
+4.	docker rm <id> ---->delete the docker container  (when changes to dockerfile, needs to rebuild container)
+	docker rmi <id> ---->delete the docker image
+	docker images
+	docker build -t my-app:1.0 .
+
+----Docker Registry
+•	docker login
+•	aws private repo login
+	o	docker tag
+	o	docker push
+
+----Docker Volume  (data to persist)
+•	docker run -v /home/mount/data:/var/lib/mysql/data  (map HFS : VFS)
+•	docker run -v /var/lib/mysql/data  (anonymous volume created by docker)
+•	docker run -v <name>:/var/lib/mysql/data  (name gives reference to the volume)-Named volume
+
+------------------pg docker
+
+----pg\Dockerfile
+FROM postgres 
+# Expose Port
+EXPOSE 5432
+ENV POSTGRES_USER admin
+ENV POSTGRES_PASSWORD admin
+ENV POSTGRES_DB citius 
+#COPY ./pg/init.sql /docker-entrypoint-initdb.d/
+
+
+
+
+--cmd
+docker build -t pg .
+docker images
+docker run --name pg <id>
+
+docker rm pg; docker build . ; docker run --name pg <id>
+
+
+
+----docker-compose.yml
+version: "3"
+
+volumes:
+  postgres_data: {}
+
+services:
+  pg:
+    build:
+      context: .
+      dockerfile: ./pg/Dockerfile
+    image: postgres
+    container_name: "postgres"
+    ports:
+      - "5002:5432"
+    volumes: #/var/lib/postgresql/data is used because postgress needs some directory depth (will break otherwise)
+      - postgres_data:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          cpus: 0.50
+          memory: 512M
+        reservations:
+          cpus: 0.25
+          memory: 128M
+
+
+---wsl
+cmd; cd d:\dockeripam; wsl
+docker-compose -f docker-compose.yml up
+
+----------------------------ipambe docker
+Models\index.js -----Using the sequelize object from process.env.PGHOST, which uses Docker service as host instead of “localhost”
+const sequelize = new Sequelize(config.database, config.username, config.password, {
+  host: process.env.PGHOST || config.host,
+  dialect: config.dialect,
+....
+
+---Dockerfile & docker-compose.yml
+docker-compose build   --->incase of any changes
+docker images; docker rmi <id>; docker-compose -f docker-compose.yml up
+
+
+------ipamfe docker
+package.json:     "start": "PORT=5001 react-scripts start",
+
+
+----------After changes in docker
+docker rm <>
+docker rmi pg
+docker build -t postgres ./pg
+docker images; docker rmi <id>;
+docker run -d postgres --name pg   //postgres is imagename. pg is container name
+docker exec -it pg bash
+
+docker run postgres -p 5432:5432 -e POSTGRES_USER=admin  -e POSTGRES_PASSWORD=admin  -e POSTGRES_DB=ipam  -v /var/run/docker.sock:/var/run/docker.sock
+
+#--name is name of container and last line pg is image name
+docker run -d \
+    --name pg \
+    -e POSTGRES_PASSWORD=admin \
+    -e POSTGRES_DB=ipam \
+    -e POSTGRES_USER=admin \
+    -e PGDATA=/var/lib/postgresql/data/pgdata \
+    -v /custom/mount:/var/lib/postgresql/data \
+    pg
+
+docker exec -it pg bash
+psql -d ipam -U admin
+psql -h localhost -p 5432 -d ipam -U admin
+
+docker ps
+docker stop <id>
+
+-------------------docker-compose after changes in project
+stop the service in UI
+docker-compose build ipam-fe
+docker-compose -f docker-compose.yml up -d
+
+------------docker Calm dsl
+
+https://github.com/nutanix/calm-dsl
+Calm dsl https://nutanix.slack.com/archives/C8FHE2Q69/p1634616628181100
+
+----Initialisation & Testing
+calm init dsl   =>need to key in PC credential
+calm get bps
+
+OR
+--Calm Initialization and configuration
+Setup: calm init dsl. Please fill in the right Prism Central (PC) settings.
+Server status: calm get server status. Check if Calm is enabled on PC & Calm version is >=2.9.7.
+Config: calm show config. Please see calm set config --help to update configuration.
+
+default config file stored mentioned in ~/.calm/init.ini
+nvironment variables for server configuration: CALM_DSL_PC_IP, CALM_DSL_PC_PORT, CALM_DSL_PC_USERNAME, CALM_DSL_PC_PASSWORD.
+Environment variable for project configuration: CALM_DSL_DEFAULT_PROJECT.
+Environment variable for log configuration: CALM_DSL_LOG_LEVEL.
+Environment variables for init configuration: CALM_DSL_CONFIG_FILE_LOCATION, CALM_DSL_LOCAL_DIR_LOCATION, CALM_DSL_DB_LOCATION.
+Config file parameter: calm --config/-c <config_file_location> ...
+Show config in context: calm show config.
+
+---------blueprint
+calm init bp  ----->create a bp HelloBlueprint
+calm compile bp --file HelloBlueprint/blueprint.py  --->after changes compile & upload the bp
+calm create bp --file HelloBlueprint/blueprint.py --name HelloBlueprint
+
+----launch bp
+calm get bps --help
+calm get bps --name HelloBlueprint
+calm launch bp HelloBlueprint --app_name HelloBlueprint02 -i ---------> --environment <env_name> used for including env specific
+calm describe app HelloBlueprint02
+
+calm publish bp <bp_name> --version <version> --project <project_name>. Please look at calm publish bp --help
+
+------Calm application
+List apps: calm get apps. Use calm get apps -q to show only application names.
+Create app: calm create app -f <file>. Command will create blueprint and launch it to get application. Please look at calm create app -h.
+Describe app: calm describe app <app_name>. It will print a summary of the application and the current application state. Use calm describe app <name> 2>/dev/null --out json | jq '.["status"]' to get fields from the app json. More info on how to use jq here.
+Delete app: calm delete app <app_name>. You can delete multiple apps using: calm get apps -q | xargs -I {} calm delete app {}.
+Run action on application: calm run action <action_name> --app <application_name>
+Start an application: calm start app <app_name>
+Stop an application: calm stop app <app_name>
+Restart an application: calm restart app <app_name>
+Display app action runlogs: calm watch app <app_name>
+Watch app action runlog: calm watch action_runlog <runlog_uuid> --app <application_name>
+Download app action runlogs: calm download action_runlog <runlog_uuid> --app <application_name> --file <file_name>
+
+-------------------Docker dsl
+open dockerdesktop ---->docker demon started in laptop
+cmd to D:\DockerIPAM\dsl [or] wsl
+docker ps
+
+docker pull ntnx/calm-dsl  -------->get Latest image
+docker run -it ntnx/calm-dsl --------->start the docker and logon
+[or]
+docker run -it --name calm-dsl ntnx/calm-dsl ----->this does not set env even updated in Dockerfile
+
+----Initialize or connect to PC
+docker exec -it calm-dsl sh
+calm init dsl  [or] calm init dsl -i 10.135.20.2 -P 9440 -u admin -p Nutanix@123 -pj default
+[OR]
+cd /usr/local/lib/python3.7/site-packages/calm/dsl/config/
+config.ini.jinja2, init.ini.jinja2 ----->need to update config file
+
+
+calm get bps
+docker exec -i calm-dsl bash -c "calm get bps"  ----->from outside the cmd of laptop
+
+calm launch bp "Nutanix Calm Workshop Demo-Raaj" --app_name test-Raaj -i
+docker exec -i calm-dsl bash -c "calm launch bp 'Nutanix Calm Workshop Demo-Raaj' --app_name test-Raaj1 -i"
+
+-------end the manual and go for dockerfile approach
+exit
+create dockerfile in \dsl
+
+cd D:\DockerIPAM\dsl
+
+docker exec -it calm-dsl
+calm get apps -q
+
+docker-compose build dsl
+docker-compose -f docker-compose.yml up -d dsl
+
+
+----adding express server to calm-dsl
+docker cp dsl/dsl.js calm-dsl:/
+docker cp dsl/package.json calm-dsl:/
+
+--Working cmd
+#curl -X POST -d "cmd=docker exec -i calm-dsl bash -c \"calm get bps\"" http://localhost:5004/cmd
+
+---local Filesystem command execution
+curl -X POST -d "cmd=ls -l" http://localhost:5004/cmd
+
+---get from Calm-DSL
+curl -X POST -d "cmd=calm get bps" http://localhost:5004/cmd
+curl -X POST -d "cmd=calm get apps -q" http://localhost:5004/cmd
+
+---Launch BP
+curl -X POST -d "cmd=calm launch bp 'Nutanix Calm Workshop Demo-Raaj' --app_name test-Raaj3 -i" http://localhost:5004/cmd
+
+---day2 (calm run action <action_name> --app <application_name>)
+curl -X POST -d "cmd=calm get apps" http://localhost:5004/cmd
+curl -X POST -d "cmd=calm describe app test-Raaj3" http://localhost:5004/cmd
+
+curl -X POST -d "cmd=calm stop app test-Raaj3" http://localhost:5004/cmd
+curl -X POST -d "cmd=calm start app test-Raaj3" http://localhost:5004/cmd
+#curl -X POST -d "cmd=calm run action ScaleOut --app test-Raaj3" http://localhost:5004/cmd
+
+
+--------------BP: Test-Raaj AppProfile: Nutanix Variable: MYSQL_PASSWORD
+---use default values to launch BP
+calm launch bp HelloBlueprint --app_name HelloApp01 --ignore_runtime_variables
+
+---pass parameter to BP (i ran from wsl of laptop. equivalent of js used on BE)
+calm launch bp --help
+
+--set variables value in file
+param1 = 'variable_list = [{"value": {"value": "customPasswordValue"}, "context": "Nutanix", "name": "MYSQL_PASSWORD"},]'
+param1 = 'variable_list = [{"value": {"value": "customPasswordValue"}, "name": "MYSQL_PASSWORD"},]'
+echo $param1
+curl -X POST -d "cmd=echo $param1>./runtime_variables.py" http://localhost:5004/cmd
+
+---launch bp with inputvariables
+curl -X POST -d "cmd=calm launch bp Test-Raaj --app_name test-Raaj5 --launch_params ./runtime_variables.py -i" http://localhost:5004/cmd
+
+Ref: https://www.nutanix.dev/2020/07/29/nutanix-calm-dsl-blueprint-launch-parameters/
+https://githubhelp.com/LevyForchh/calm-dsl
+
+
+----substrate input
+https://nutanix.slack.com/archives/C8FHE2Q69/p1621259243360900
+https://github.com/nutanix/calm-dsl/blob/master/tests/cli/runtime_helpers/ahv/editable_params.py
+
+
+

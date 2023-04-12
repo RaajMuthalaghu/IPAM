@@ -1,0 +1,109 @@
+version: "3"
+
+volumes:
+  postgres_data: {}
+
+services:
+  pg:
+    build:
+      context: .
+      dockerfile: ./pg/Dockerfile
+    image: postgres
+    container_name: "postgres"
+    ports:
+      - "5002:5432"
+    volumes: #/var/lib/postgresql/data is used because postgress needs some directory depth (will break otherwise)
+      - postgres_data:/var/lib/postgresql/data
+ #   deploy:
+ #     resources:
+ #       limits:
+ #         cpus: 0.50
+ #         memory: 512M
+ #       reservations:
+#          cpus: 0.25
+#          memory: 128M
+
+  ipam-be:
+    build:
+      # context is the file location from where other files are relative to. In this case, the location of docker-compose.yml.
+      context: .
+      dockerfile: ./ipam-be/Dockerfile
+    image: ipam-be # the name of the docker image we are creating
+    environment:
+      - PGHOST=pg  # host.docker.internal # NAME OF THE SERVICE
+      - PGPORT=5002
+    depends_on:
+      - pg
+    # Volumes will always be mounted. 
+    volumes: # mount the backend folder to a new client folder in container to allow for hot-reloading
+      - ./ipam-be:/ipam-be
+    # used to define the mapping between the host server and Docker container. application_port:docker_container_port
+    ports:
+      - "5000:5000"
+ #   deploy:
+ #     resources:
+ #       limits:
+ #         cpus: 0.50
+ #         memory: 512M
+ #       reservations:
+#          cpus: 0.25
+#          memory: 128M
+    # Use a script to allow for hot-reloading with container via mounting
+    # If node_modules folder already exists, delete it
+    # copy node_modules folder from image
+    # Note: command overwrite 'CMD' in dockerfiles and is run when image is started.
+    #command: node app.js #sh -c 'node app.js'
+  ipam-fe:
+    build:
+      context: .
+      dockerfile: ./ipam-fe/Dockerfile
+    image: ipam-fe
+    volumes: # mount the ipam-fe folder to a new client folder in container to allow for hot-reloading
+      - ./ipam-fe:/ipam-fe
+    #env_file:
+      #- ./.envs/.ipam-fe
+    depends_on:
+      - ipam-be
+    ports:
+      - "5001:5001"
+ #   deploy:
+ #     resources:
+ #       limits:
+ #         cpus: 0.50
+ #         memory: 512M
+ #       reservations:
+#          cpus: 0.25
+#          memory: 128M
+    # Use a script to allow for hot-reloading with container via mounting
+    # If node_modules folder already exists, delete it
+    # copy node_modules folder from image
+    # Note: command overwrite 'CMD' in dockerfiles and is run when image is started.
+    #command: npm start
+  dsl:
+    build:
+      context: .
+      dockerfile: ./dsl/Dockerfile
+    image: calm-wrapper
+    container_name: "calm-wrapper"
+    ports:
+      - "5004:5004"
+    volumes: # mount the ipam-fe folder to a new client folder in container to allow for hot-reloading
+      - ./dsl:/dsl
+    #env_file:
+      #- ./.envs/.ipam-fe
+#    depends_on:
+#      - ipam-fe
+ #   deploy:
+ #     resources:
+ #       limits:
+ #         cpus: 0.50
+#          memory: 512M
+ #       reservations:
+#          cpus: 0.25
+#          memory: 128M
+    # Use a script to allow for hot-reloading with container via mounting
+    # If node_modules folder already exists, delete it
+    # copy node_modules folder from image
+    # Note: command overwrite 'CMD' in dockerfiles and is run when image is started.
+    #command: npm start
+    

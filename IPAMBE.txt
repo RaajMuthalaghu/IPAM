@@ -1,0 +1,370 @@
+----local postgres
+master password is citius
+db:citius, postgres, ipam
+users: postgres/postgres, admin/admin
+Table: 
+  ipamusers(username, password, admintype)
+
+--------------------------------------Study1(pg table direct access from node.js)
+mkdir IPAMcc/study1
+cd IPAMcc/study1
+
+npm init -y   =>creates package.json
+code .
+npm install pg
+
+----create server.js
+const {Client} = require('pg')
+const client = new Client({host: "localhost", user: "admin", database: "ipam", password: "admin", port: "5432"})
+client.connect();
+client.query("select * from ipamusers", (err,res)=>{
+    if(!err){console.log(res.rows); }
+    else{ console.log(err.message); }
+    client.end;
+})
+
+node server.js
+
+---------------------------------------study2(rest api express.js, no pg(hardcoded data))
+mkdir IPAMcc/study2
+cd IPAMcc/study2
+
+npm init -y   =>creates package.json
+code .
+npm install express
+
+-----create app.js
+++ express initialize and listen
+
+npm i nodemon -D
+--package.json
+"scripts":{
+"ipamapi": "nodemon app.js",
+}
+
+//Without Nodemon, you can always run your app directly by node app.js.
+npm run ipamapi
+
+------create api.js with hardcoded list of users
+++json format list of users
+++ functions to listusers, getuser, add, update, delete
+++ exports
+
+
+curl http://localhost:5000/users
+
+
+---------------------------------------study3(rest api express.js, pg)
+mkdir IPAMcc/study3
+cd IPAMcc/study3
+
+npm init -y   =>creates package.json
+code .
+npm install express pg
+
+-----create app.js
+++ express initialize and listen
+
+npm i nodemon -D
+--package.json
+"scripts":{
+"ipamapi": "nodemon app.js",
+}
+
+//Without Nodemon, you can always run your app directly by node app.js.
+npm run ipamapi
+[or] nodemon app.js
+
+------create api.js connects to pg
+++pg connect
+++ functions to listusers, getuser, add, update, delete
+++ exports
+
+---app.js
+++include api.js
+
+curl http://localhost:5000/
+curl http://localhost:5000/users
+curl http://localhost:5000/users/Elaine/
+
+curl -X POST -d "username=Elaine&password=Elaine&admintype=False" http://localhost:5000/users
+curl -X PUT  -d "password=Elaine&admintype=True" http://localhost:5000/users/Elaine
+curl -X "DELETE" http://localhost:5000/users/Elaine
+
+---------------------------------------ipam
+mkdir IPAMcc/ipam
+cd IPAMcc/ipam
+
+npm init -y   =>creates package.json
+code .
+npm install express pg
+
+-----create app.js
+++ express initialize and listen
+
+npm i nodemon -D
+--package.json
+"scripts":{
+"ipam": "nodemon ipam.js",
+}
+
+//Without Nodemon, you can always run your app directly by node app.js.
+npm run ipam
+[or] nodemon ipam.js
+
+------create ipamusers.js connects to pg
+++pg connect
+++ functions to authenticate, listusers, getuser, add, update, delete
+++ exports
+
+---app.js
+++include ipamusers.js
+
+curl http://localhost:5000/
+curl http://localhost:5000/users
+curl http://localhost:5000/users/Elaine1/
+curl -X POST -d "username=admin&password=admin" http://localhost:5000/users/authenticate
+
+curl -X POST -d "username=Elaine8&password=Elaine&admintype=False" http://localhost:5000/users
+curl -X PUT  -d "password=Elaine1" http://localhost:5000/users/Elaine1
+curl -X PUT  -d "admintype=True" http://localhost:5000/users/Elaine1
+curl -X "DELETE" http://localhost:5000/users/Elaine
+-------------
+curl http://localhost:5000/networks
+curl http://localhost:5000/networks/test
+
+curl -X POST -d "network=test2&vlan=1002&subnet=20.0.0.1/24&netmask=255.255.255.0&gateway=20.0.0.1&fromIP=20.0.0.2&toIP=20.0.0.254" http://localhost:5000/networks
+curl -X PUT  -d "vlan=102&subnet=20.0.0.1/24&netmask=255.255.255.0&gateway=20.0.0.1&fromIP=20.0.0.2&toIP=20.0.0.254" http://localhost:5000/networks/test1
+curl -X "DELETE" http://localhost:5000/networks/network=test1
+---------
+curl http://localhost:5000/ips/test
+curl http://localhost:5000/freeips/test
+curl http://localhost:5000/usedips/test
+
+curl -X POST -d "network=test1&ip=10.10.0.6&exclude=false" http://localhost:5000/ips
+curl -X PUT  -d "exclude=false&hostname=vm3" http://localhost:5000/ips/10.10.0.5
+curl -X "DELETE" http://localhost:5000/ips/test1
+
+---------
+Pending:
+seeders
+0. curl http://localhost:5000/users/Elaine1/Elaine1 --->authenticate
+1. technical pendings: routers, sequelizers, migration?,redis-Need Vikram help
+2. functionality pending: password encryption -Need Vikram advise on npm package
+3. architecture pending: container, k8s -Need Vikram help.
+
+Ques:
+1. what should try next- FrontEnd or containerise the BE?
+2. what is advisable-common container for FE & BE or individual containers?
+1. are you using github as docker repo for webui?
+2. how to pull web-ui image and execute from my laptop?
+2. what is the base docker image? win/linux based?
+3. docker run -d <redis>run in deattach mode
+4. zoom session for code review, fine tune, improvement suggestion.
+
+JS/npm subnet script?
+dbeaver for postgres fe?
+
+------study9(pg in docker) https://www.youtube.com/watch?v=iZDbENJrl4I
+docker container ls -a ===>check any container running
+telnet localhost 5432 ====>check any app using port 5432
+
+docker container run -d --name=pg -p 5432:5432 -e POSTGRES_PASSWORD=secret -e PGDATA=/pgdata -v /pgdata:/pgdata postgres:11.4 (==>-d daemon process)
+docker container ls
+cd /pgdata
+
+psql -h localhost -p 5432 -U postgres -->create a table and inserted.
+*host based authentication specified for each network address/range in pga_hba.conf.
+
+docker exec -it pg bash
+ls /pgdata
+exit
+docker exec -it pg psql -U postgres  -->can see table
+docker stop pg
+docker ls
+docker ls -a
+docker rm pg
+--upgrade container 
+docker container run -d --name=pg11 -p 5432:5432 -e POSTGRES_PASSWORD=secret -e PGDATA=/pgdata -v /pgdata:/pgdata postgres:11
+docker exec -it pg psql -U postgres   --->can see table
+
+---my laptop PGDATA=D:\Program Files\PostgreSQL\13\data
+
+---------Refactor
+1. bcrypt -FE  
+2. /user/pass =>authenticate (postman real authentication ?)
+
+
+1. postman can access all routes without authenciate. how to allow to execute routes if only authenticated?
+2. 
+ 
+mvc- ui is view(html,css)....
+	contoller- busilogic-it calls fn in model
+	model -db related stuff- each table corres model file- orm=sequelizer. for eg. 5rows in table will be 5objects. 
+
+route- ipam.js. separate route file for ipamuser,.... create folder route and create routefiles for each ipamuser, network, ip.
+migration- db related op. 2,3 rows insert into table. remove column, add column...
+utils
+-----https://scotch.io/tutorials/getting-started-with-node-express-and-postgres-using-sequelize
+
+----------
+1. from root dir, create bin and server dir
+2.
+npm init -y
+npm install express body-parser pg pg-hstore
+3. in app.js
+// Setup a default catch-all route that sends back a welcome message in JSON format.
+app.get('*', (req, res) => res.status(200).send({
+  message: 'Welcome to the beginning of nothingness.',
+}));
+
+module.exports = app;
+
+4.
+npm install -g sequelize-cli
+5. create .sequelizerc file to add files to sequelize
+const path = require('path');
+module.exports = {
+  "config": path.resolve('./server/config', 'config.json'),
+  "models-path": path.resolve('./server/models'),
+  "seeders-path": path.resolve('./server/seeders'),
+  "migrations-path": path.resolve('./server/migrations')
+};
+//The config.json file contain our application configuration settings, such as database authentication configuration. migrations folder will hold our application's migrations, while the models folder will hold the application models. Seed data is initial data provided with a system for testing, training or templating purposes. 
+6.
+npm install sequelize 
+sequelize init  =>command in order to create the specified folders and generate boilerplate code.
+dotenv, an npm package that makes automatically exporting values into our app environment, typically named .env and exports them into our environment.
+--outputs:
+Created "server\config\config.json"
+Successfully created models folder at "C:\Users\raajm\Desktop\CitiusCloud\Web UI\IPAMcc\ipam\server\models".
+Successfully created migrations folder at "C:\Users\raajm\Desktop\CitiusCloud\Web UI\IPAMcc\ipam\server\migrations".
+Successfully created seeders folder at "C:\Users\raajm\Desktop\CitiusCloud\Web UI\IPAMcc\ipam\server\seeders".
+
+--\server\config\config.json =>update postgres credential
+
+sequelize model:create --name ipamuser --attributes username:string,password:string,admintype:boolean
+sequelize model:create --name ipamnetwork --attributes network:string,vlan:integer,subnet:string,netmask:string,gateway:string,fromip:string,toip:string
+sequelize model:create --name ipamip --attributes network:string,ip:string,exclude:boolean,hostname:string
+
+sequelize model:create --name users --attributes username:string,password:string,email:string
+sequelize model:create --name roles --attributes id:integer,name:string
+
+
+------>results
+New model was created at C:\Users\raajm\Desktop\CitiusCloud\Web UI\IPAMcc\ipam\server\models\ipamuser.js .
+New migration was created at C:\Users\raajm\Desktop\CitiusCloud\Web UI\IPAMcc\ipam\server\migrations\20210903052003-create-ipamuser.js .
+New model was created at C:\Users\raajm\Desktop\CitiusCloud\Web UI\IPAMcc\ipam\server\models\ipamnetwork.js .
+New migration was created at C:\Users\raajm\Desktop\CitiusCloud\Web UI\IPAMcc\ipam\server\migrations\20210903052035-create-ipamnetwork.js .
+New model was created at C:\Users\raajm\Desktop\CitiusCloud\Web UI\IPAMcc\ipam\server\models\ipamip.js .
+New migration was created at C:\Users\raajm\Desktop\CitiusCloud\Web UI\IPAMcc\ipam\server\migrations\20210903052053-create-ipamip.js .
+
+sequelize db:migrate  =>this not deleted table rows
+
+-----------------Creating Controllers and Routing(controller per table will be responsible for creating, listing, updating and deleting)
+server/controllers/ipamusers.js   ===>create fn implemented
+server/controllers/index.js
+server/routes/index.js
+
+curl  http://localhost:5000/users
+curl  http://localhost:5000/users/Raaj
+curl  http://localhost:5000/networks
+curl  http://localhost:5000/ips
+curl  http://localhost:5000/ips/test2
+
+curl -X POST -d "network=test1&vlan=1002&subnet=20.0.0.1/24&netmask=255.255.255.0&gateway=20.0.0.1&fromip=20.0.0.2&toip=20.0.0.254" http://localhost:5000/networks
+curl -X POST -d "network=test2&ip=10.0.0.5&exclude=false&hostname=null" http://localhost:5000/ips
+curl -X POST -d "network=test2&ip=20.0.0.5" http://localhost:5000/ips
+curl -X POST -d "network=test2&ip=20.0.0.6&exclude=true" http://localhost:5000/ips
+
+#mv models models.bak && sequelize init:models && mv models.bak/index.js models.bak/index.js.bak && mv models.bak/* models/ && rm models.bak
+
+curl http://localhost:5000/networks/test
+curl -X PUT  -d "vlan=102&subnet=20.0.0.2/24&netmask=255.255.255.2&gateway=20.0.0.2&fromIP=20.0.0.2&toIP=20.0.0.254" http://localhost:5000/networks/test2
+curl -X "DELETE" http://localhost:5000/networks/test1
+
+curl -X PUT  -d "exclude=false" http://localhost:5000/ips/20.0.0.6
+curl -X DELETE http://localhost:5000/ips/20.0.0.6
+
+curl -X POST -d "username=Raaj&password=Raaj&admintype=true" http://localhost:5000/users
+curl -X POST -d "username=admin&password=admin&admintype=true" http://localhost:5000/users
+curl -X PUT -d "admintype=false" http://localhost:5000/users/admin
+curl -X DELETE http://localhost:5000/users/admin
+curl -X POST -d "username=Raaj&password=Raaj" http://localhost:5000/authenticate
+
+sequelize seed:create --name ipamnetwork
+sequelize seed:create --name ipamip
+sequelize db:seed:all
+#npx sequelize-cli migration:generate --name migration-seed
+
+
+---JWT Authentication (three important parts of a JWT: Header, Payload, Signature.) 
+eg. Authorization: Bearer [header].[payload].[signature]   -----or---   x-access-token: [header].[payload].[signature]
+– config
+
+configure PostgreSQL database & Sequelize
+configure Auth Key
+– routes
+
+auth.routes.js: POST signup & signin
+user.routes.js: GET public & protected resources
+– middlewares
+
+verifySignUp.js: check duplicate Username or Email
+authJwt.js: verify Token, check User roles in database
+– controllers
+
+auth.controller.js: handle signup & signin actions
+user.controller.js: return public & protected content
+– models for Sequelize Models
+
+user.model.js
+role.model.js
+– server.js: import and initialize neccesary modules and routes, listen for connections.
+--------------------------------
+npm init -y
+npm install express sequelize pg pg-hstore body-parser cors jsonwebtoken bcryptjs --save
+npm install cors jsonwebtoken bcryptjs --save
+
+----define sequelize model
+models/user.model.js and models/role.model.js
+
+----initialize model (app/models/index.js)
+db.ROLES = ["user", "admin"];
+
+---Configure Auth Key (/config/auth.config.js)
+module.exports = {secret: "citiuscloud"};
+
+---middleware/verifySignUp.js (checkDuplicateUsername)
+---middleware/authJwt.js (verifyToken, isAdmin)
+---middleware/index.js
+
+---controllers/user.controller.js (allAccess, userBoard, adminBoard )
+---routes/auth.routes.js ()
+routes/user.routes.js ()
+
+----user api
+curl -u "Raaj:Raaj" http://localhost:5000/users
+curl -u "Raaj:Raaj" -X POST -d "username=one&password=one&admintype=false" http://localhost:5000/auth/signup
+curl -u "Raaj:Raaj" -X PUT -d "admintype=false" http://localhost:5000/users/admin
+curl -u "Raaj:Raaj" -X PUT -d "password=admin2" http://localhost:5000/users/admin
+curl -u "one:one" http://localhost:5000/users/admin
+curl -X DELETE -u "Raaj:Raaj" http://localhost:5000/users/admin
+
+-----network api
+curl -u "Raaj:Raaj" http://localhost:5000/networks
+curl -u "Raaj:Raaj" -X POST -d "network=test3&vlan=1003&subnet=30.0.0.1/24&netmask=255.255.255.0&gateway=30.0.0.1&fromip=30.0.0.2&toip=30.0.0.254" http://localhost:5000/networks
+curl -u "Raaj:Raaj" http://localhost:5000/networks/test3
+curl -u "Raaj:Raaj" -X PUT  -d "vlan=102&subnet=20.0.0.2/24&netmask=255.255.255.2&gateway=20.0.0.2&fromIP=20.0.0.2&toIP=20.0.0.254" http://localhost:5000/networks/test2
+curl -u "Raaj:Raaj" -X "DELETE" http://localhost:5000/networks/test1
+
+-----ip api
+curl -u "Raaj:Raaj" http://localhost:5000/ips
+curl -u "Raaj:Raaj" http://localhost:5000/ips/test2
+curl -u "Raaj:Raaj" http://localhost:5000/ips/test2/20.0.0.4
+curl -u "Raaj:Raaj" -X POST -d "network=test2&ip=20.0.0.5" http://localhost:5000/ips
+curl -u "Raaj:Raaj" -X POST -d "network=test2&ip=20.0.0.6&exclude=true" http://localhost:5000/ips
+curl -u "Raaj:Raaj" -X PUT  -d "exclude=false" http://localhost:5000/ips/20.0.0.6
+curl -u "Raaj:Raaj" -X DELETE http://localhost:5000/ips/20.0.0.6
+
+

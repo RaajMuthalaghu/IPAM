@@ -1,0 +1,318 @@
+node -v
+npx create-react-app . ----->instead of download, will run the cmd
+npm start
+
+-------https://www.bezkoder.com/react-redux-jwt-auth/#Overview_of_React_Redux_JWT_Authentication_example
+1. The App component is a container with React Router. It gets app state from Redux Store. Then the navbar now can display based on the state.
+2. 	– actions folder contains all the action creators (auth.js for register & login, message.js for response message from server).
+	– reducers folder contains all the reducers, each reducer updates a different part of the application state corresponding to dispatched action.
+3. 
+
+#npm install -g create-react-app
+#create-react-app cloudprint
+npx create-react-app ipam-fe
+cd ipam-fe
+npm install react-router-dom
+
+
+---Import Bootstrap
+npm install bootstrap
+src/App.js and modify the code inside it
+
+------Create Services(src/services)
+ auth-header.js
+ auth.service.js (Authentication service)
+ user.service.js (Data service)
+
+npm install axios
+---Authentication service
+The service uses Axios for HTTP requests and Local Storage for user information & JWT.
+It provides following important methods:
+login(): POST {username, password} & save JWT to Local Storage
+logout(): remove JWT from Local Storage
+register(): POST {username, email, password}
+
+------Data service
+We also have methods for retrieving data from server. In the case we access protected resources, the HTTP request needs Authorization header.
+Let’s create a helper function called authHeader() inside auth-header.js:
+
+----Create Redux Actions(src/actions)
+ types.js ----defined some string constant that indicates the type of action being performed.
+ auth.js (register/login/logout actions)----actions related to authentication
+ message.js (set/clear message actions) -----actions related to messages (notifications) from APIs.
+
+---auth.js
+– register()
+
+calls the AuthService.register(username, email, password)
+dispatch REGISTER_SUCCESS and SET_MESSAGE if successful
+dispatch REGISTER_FAIL and SET_MESSAGE if failed
+– login()
+
+calls the AuthService.login(username, password)
+dispatch LOGIN_SUCCESS and SET_MESSAGE if successful
+dispatch LOGIN_FAIL and SET_MESSAGE if failed
+Both action creators return a Promise for Components using them.
+
+----Create Redux Reducers
+There will be two reducers in src/reducers folder, each reducer updates a different part of the state corresponding to dispatched Redux actions.
+ index.js----Because we only have a single store in a Redux application. We use reducer composition instead of many stores to split data handling logic.
+ auth.js (register/login/logout)---reducer will update the isLoggedIn and user state of the application.
+ message.js (set/clear message)---This reducer updates message state when message action is dispatched from anywhere in the application.
+
+---------Create Redux Store
+This Store will bring Actions and Reducers together and hold the Application state.
+
+Now we need to install Redux, Thunk Middleware and Redux Devtool Extension.
+Run the command:
+
+npm install redux redux-thunk
+npm install --save-dev redux-devtools-extension
+
+store.js-------In the previous section, we used combineReducers() to combine 2 reducers into one. Let’s import it, and pass it to createStore():
+
+----Create React Components for Authentication
+ login.component.js
+ register.component.js
+ profile.component.js
+
+npm install react-validation validator --------we need a library for Form validation
+
+----Login Page(login.component.js)
+This page has a Form with username & password.
+– We’re gonna verify them as required field.
+– If the verification is ok, we dispatch login action, then direct user to Profile page: this.props.history.push("/profile");.
+
+For the application state, we use Redux connect() function with mapStateToProps:
+– redirect user to Profile page by checking isLoggedIn
+– show response message with message
+
+-----Register Page(register.component.js)
+This page is similar to Login Page.
+
+For Form Validation, there are some more details:
+
+username: required, between 3 and 20 characters
+email: required, email format
+password: required, between 6 and 40 characters
+We’re gonna dispatch register action and show response message (successful or error).
+
+-----Profile Page(profile.component.js)
+This page gets current User from Local Storage by getting user in the application state and show user information (with token).
+
+-----Create React Components for accessing Resources
+These components will use UserService to request data from API.
+
+ home.component.js
+ board-user.component.js
+ board-moderator.component.js
+ board-admin.component.js
+
+----Home Page(home.component.js)
+This is a public page that shows public content. People don’t need to log in to view this page.
+
+-----Role-based Pages
+We’re gonna have 3 pages for accessing protected data:
+
+BoardUser page calls UserService.getUserBoard()
+BoardModerator page calls UserService.getModeratorBoard()
+BoardAdmin page calls UserService.getAdminBoard()
+I will show you User Page for example, other Pages are similar to this Page.
+
+-----Add Navbar and define Routes(helpers/history.js)
+Create React Router History
+This is a custom history object used by the React Router.
+
+-------Modify App Component
+Now we add a navigation bar in App component. This is the root container for our application.
+The navbar dynamically changes by login status and current User’s roles.
+
+Home: always
+Login & Sign Up: if user hasn’t signed in yet
+User: there is user value in the application state
+Board Moderator: roles includes ROLE_MODERATOR
+Board Admin: roles includes ROLE_ADMIN
+
+----Add CSS style for React Components(src/App.css)
+
+
+
+
+
+
+npm start
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+--https://www.bezkoder.com/react-node-express-postgresql/
+--https://www.bezkoder.com/react-redux-crud-example/
+--https://www.bezkoder.com/react-hooks-redux-login-registration-example/
+--https://www.bezkoder.com/react-typescript-login-example/
+
+React.js(Router, Components, Service, axios--->)-----http--->Node.js(router, Controller, ORM) <----->pg
+
+
+--------------------fe1
+npx create-react-app fe1
+cd fe1
+
+npm install bootstrap react-router-dom axios
+
+--Initialize Axios for React CRUD HTTP Client(http-common.js)
+--Create Data Service
+	services/user.service.js---create a service that uses axios object above to send HTTP requests.
+-------Create React Components/Pages
+Now we’re gonna build 3 components corresponding to 3 Routes defined before.
+Add new Item (components/add-user.component.js)
+List of items
+Item details
+First, we define the constructor and set initial state, bind this to the different events.
+
+Because there are 2 fields, so we create 2 functions to track the values of the input and set that state for changes. We also have a function to get value of the form (state) and send the POST request to the Web API. It calls TutorialDataService.create() method.
+
+For render() method, we check the submitted state, if it is true, we show Add button for creating new Tutorial again. Otherwise, a Form will display.
+
+---List of items Component(/components/tutorials-list.component.js)
+This component has:
+a search bar for finding Tutorials by title.
+a tutorials array displayed as a list on the left.
+a selected Tutorial which is shown on the right.
+
+So we will have following state: searchUser, users, currentUser and currentIndex
+We also need to use 3 TutorialDataService methods: getAll(), deleteAll(), findByUserName()
+
+----If you click on Edit button of any Tutorial, the app will direct you to User page.(components/user.component.js)
+We use React Router Link for accessing that page with url: /users/:username.
+Item details Component---We’re gonna use the component lifecycle method: componentDidMount() to fetch the data from the Web API.
+
+----Add CSS style for React Components (src/App.css)
+npm start
+
+git clone <repo.git>
+git status
+git pull origin
+git add .
+git commit -m "message"
+git push origin
+
+
+----Pending
+1. Add user shows previous user detail. it should be empty text box
+2. "Add User" and "Edit User" are Links. it should be button
+3. Search works only with exact name. should be wildchar
+
+r1. Redux
+r2. login
+r3. from scratch flow
+r4. validation
+
+
+-----------Redux (store & thunk middleware)- https://www.bezkoder.com/react-redux-crud-example/
+We’re gonna create Redux store for storing tutorials data. Other React Components will work with the Store via dispatching an action.
+
+The reducer will take the action and return new state.
+– actions folder contains the action creator (tutorials.js for CRUD operations and searching).
+– reducers folder contains the reducer (tutorials.js) which updates the application state corresponding to dispatched action.
+
+------Create Redux Actions (actions/type.js)
+-----Actions Creator (actions/users.js)
+This is creator for actions related to users. We’re gonna import UserDataService to make asynchronous HTTP requests with trigger dispatch on the result.
+
+------Create Redux Reducer
+There will be a reducer in src/reducers folder, the reducer updates the state corresponding to dispatched Redux actions.
+---reducers/index.js Because we only have a single store in a Redux application. We use reducer composition instead of many stores to split data handling logic.
+
+-----Create Redux Store (This Store will bring Actions and Reducers together and hold the Application state.)
+npm install redux react-redux redux-thunk
+npm install --save-dev redux-devtools-extension
+
+-----Provide State to React Components
+We will use mapStateToProps and mapDispatchToProps to connect Redux state to React Components’ props later using connect() function:
+
+export default connect(mapStateToProps, mapDispatchToProps)(ReactComponent);
+
+So we need to make the Redux store available to the connect() call in the Components. We will wrap a parent or ancestor Component in Provider.
+
+Provider is an high order component that wraps up React application and makes it aware of the entire Redux store. That is, it provides the store to its child components.
+
+Now we want our entire React App to access the store, just put the App Component within Provider.
+
+
+-----------------------------------------------Login Authentication
+Create Services
+We’re gonna create two services in src/services folder:
+
+npm add react-toastify
+
+
+-----------ipamnetwork
+npm install @fortawesome/fontawesome-free
+npm install react-table
+
+
+1. http-common.js has auth:{username: 'Raaj',password: 'Raaj'}. so always login successful and every action performed by this user. how to override to login user.
+2. create user displays username & password in parameter. how to avoid
+http://localhost:5001/auth/signup?username=two&password=two&admintype=Yes
+3. search as you type
+5. how to introduce validation in fields. (npm install react-validation validator)----https://www.bezkoder.com/react-form-validation-hooks/
+
+6. not delete ipamnetwork, if ipamip has hostname
+
+---Container
+1. db name= ipam
+2. fix foreign key error
+3. pg port 5002
+
+
+--------React Data Grid Vs AG-Grid Vs Material-UI
+AG-Grid enterprise is licensed which provides sort by column, print records, row group. http://ag-grid.com/react-grid/
+
+MUI:https://www.youtube.com/playlist?list=PLjC4UKOOcfDQtvkTBfjqeWP8EJKi_WaUn
+    https://github.com/gregnb/mui-datatables/tree/master/examples
+
+npm install @mui/material @emotion/react @emotion/styled
+npm install @mui/icons-material
+npm install @mui/styles
+npm install @mui/icons-material
+npm install @mui/lab 
+npm install @date-io/date-fns date-fns
+npm install @material-ui/core --save
+
+----export xls https://www.youtube.com/watch?v=mWbIbyLRqRw
+npm install xlsx
+
+import XLSX from 'xlsx';
+const downloadExcel = () =>{
+  const workBook=XLSX.utils.book_new()
+  const workSheet=XLSX.utils.json_to_sheet(studentData)
+  XLSX.utils.book_append_sheet(workBook, workSheet, "IPAM UserList")
+  //create buffer for bulk data
+  let buf=XLSX.write(workBook,{bookType:"xlsx",type:"buffer"})
+  //Binary string creation
+  XLSX.write(workBook,{bookType:"xlsx",type:"binary"})
+  //Download
+  XLSX.writeFile(workBook,"IPAMUsers.xlsx")
+}
+onclick:()=>downloadExcel(),isFreeAction=true
+
+--index.css,
+body{ font-family: "Roboto"
+
+component customization by className or classes attributes.
+In css, & refers parent rule. $ represents child rule.
+
+--------convert react class to function to use react hook (https://nimblewebdeveloper.com/blog/convert-react-class-to-function-component)               
+class App extends Component {  ------->       function App() {
+No render(){}
+this is not used. call fn stright away which defined inside main function
+
+state = {name: ''} -------------> const [name, setName] = useState('John Doe');
+alert(this.state.name);------------> alert(name);
+this.setState({ name: e.target.value });--------------> setName(e.target.value);
+
+componentDidMount() {this.setState({userName: 'janedoe'})}--------------> useEffect(() => {setUsername('janedoe');})
+
+
+
+
+----UI Form
+
+
