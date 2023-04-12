@@ -1,5 +1,4 @@
-FROM https://hub.docker.com/r/ntnx/calm-dsl
-# ntnx/calm-dsl
+FROM ntnx/calm-dsl
 # Expose Port
 EXPOSE 5004
 ENV CALM_DSL_PC_IP 10.135.20.2
