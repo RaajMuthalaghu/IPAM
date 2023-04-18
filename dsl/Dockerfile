@@ -12,8 +12,8 @@ WORKDIR /
 # install node.js and run dsl server
 #COPY dsl/package*.json ./
 #COPY dsl/. .
-RUN apk add  --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/v3.7/main/ nodejs=8.9.3-r1
-RUN npm install
+#RUN apk add  --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/v3.7/main/ nodejs=8.9.3-r1
+#RUN npm install
 #CMD ["node", "dsl.js"]
 
 
